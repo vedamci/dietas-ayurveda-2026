@@ -63,10 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 filename:     `Dieta_${currentDietKey}_VEDAMCI_2026.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
-                    scale: 2.5, // Mayor resolución para texto ultra nítido
+                    scale: 2.2, // Resolución de alta fidelidad
                     useCORS: true, 
                     logging: false,
-                    letterRendering: true
+                    letterRendering: true,
+                    windowWidth: 1200 // Simula pantalla de escritorio de 1200px para mantener las columnas side-by-side
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: ['avoid-all', 'css'] }

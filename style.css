@@ -432,14 +432,13 @@ body {
     border-left: 4px solid var(--color-primary);
 }
 
-/* List Formatting Instead of Commas */
 .lists-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .lists-grid {
         grid-template-columns: 1fr;
     }
@@ -490,7 +489,7 @@ body {
     background-color: var(--color-primary-light);
     padding: 1rem 1.2rem;
     border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--color-primary-light);
     transition: var(--transition-smooth);
     display: flex;
     flex-direction: column;
