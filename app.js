@@ -59,7 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Construir HTML dedicado para PDF con estilos inline
             const pdfContainer = buildPdfHtml(dieta, currentDietKey);
-            document.body.appendChild(pdfContainer);
+            
+            // Para evitar que html2canvas falle por posicionamiento "fixed" o "absolute" en el elemento capturado,
+            // creamos un wrapper contenedor que se posiciona fuera de pantalla (left: -9999px).
+            // Pasamos a html2pdf el elemento hijo (pdfContainer) que tiene flujo de diseño normal (sin posicionamiento).
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 900px; overflow: hidden; height: auto;';
+            wrapper.appendChild(pdfContainer);
+            document.body.appendChild(wrapper);
 
             const opt = {
                 margin:       [8, 8, 8, 8],
@@ -76,17 +83,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 pagebreak:    { mode: ['avoid-all', 'css'], avoid: '.pdf-category-card' }
             };
 
-            html2pdf().set(opt).from(pdfContainer).save().then(() => {
-                document.body.removeChild(pdfContainer);
-                printBtn.disabled = false;
-                printBtn.innerHTML = originalText;
-            }).catch(err => {
-                console.error('Error al generar PDF:', err);
-                if (pdfContainer.parentNode) document.body.removeChild(pdfContainer);
-                printBtn.disabled = false;
-                printBtn.innerHTML = originalText;
-                alert('Ocurrió un error al generar el PDF.');
-            });
+            // Damos un pequeño delay (150ms) para asegurarnos de que el navegador calcule el layout antes de capturar
+            setTimeout(() => {
+                html2pdf().set(opt).from(pdfContainer).save().then(() => {
+                    document.body.removeChild(wrapper);
+                    printBtn.disabled = false;
+                    printBtn.innerHTML = originalText;
+                }).catch(err => {
+                    console.error('Error al generar PDF:', err);
+                    if (wrapper.parentNode) document.body.removeChild(wrapper);
+                    printBtn.disabled = false;
+                    printBtn.innerHTML = originalText;
+                    alert('Ocurrió un error al generar el PDF.');
+                });
+            }, 150);
         });
     }
 
@@ -271,16 +281,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div');
         container.id = 'pdf-render-container';
         container.style.cssText = `
-            position: fixed; top: 0; left: 0; z-index: 99999;
-            width: 880px; 
+            width: 830px; 
             background: #ffffff;
             font-family: 'Outfit', Arial, Helvetica, sans-serif;
             color: #222222;
             line-height: 1.5;
             font-size: 13px;
-            padding: 30px 35px;
-            overflow: auto;
-            max-height: 100vh;
+            padding: 20px 25px;
+            box-sizing: border-box;
         `;
 
         // --- HEADER ---
