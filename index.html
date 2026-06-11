@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dietas Ayurvédicas VEDAMCI 2026 - Alimentos Mexicanos y Listas Detalladas</title>
+    <meta name="description" content="Dietas ayurvédicas personalizadas por dosha (Vata, Pitta, Kapha, Tridoshica) adaptadas con ingredientes locales de México en formato de lista detallada.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="app-sidebar">
+            <div class="brand-section">
+                <div class="brand-logo">🪷</div>
+                <h2 class="brand-name">VEDAMCI</h2>
+                <div class="brand-subtitle">Ayurveda México 2026</div>
+            </div>
+            
+            <nav>
+                <p class="menu-title">Seleccionar Dieta</p>
+                <ul class="diet-menu" id="sidebar-menu">
+                    <!-- Dinámicamente cargado por app.js -->
+                    <li class="loading">Cargando menú...</li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>Contacto Cel: <a href="tel:3311651870">3311651870</a></p>
+                <p><a href="https://vedamci.com.mx/" target="_blank">vedamci.com.mx</a></p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content-area">
+            
+            <!-- Controls Bar (Hidden in Print) -->
+            <header class="controls-header" id="controls-bar">
+                <div class="nav-hint">
+                    <span>Selecciona un dosha en el menú para ver y personalizar su dieta en formato de lista.</span>
+                </div>
+                <button class="btn-print" id="print-btn" title="Exportar dieta a PDF o Imprimir">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/>
+                    </svg>
+                    <span>Imprimir / PDF</span>
+                </button>
+            </header>
+
+            <!-- Rendered Diet Content -->
+            <article id="diet-content">
+                <div class="loading">
+                    <p>Cargando información de las dietas...</p>
+                </div>
+            </article>
+
+        </main>
+    </div>
+
+    <!-- Script loading -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

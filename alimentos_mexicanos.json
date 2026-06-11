@@ -1,0 +1,214 @@
+{
+  "categoria_alimentos": {
+    "cereales_y_semillas": [
+      {
+        "nombre": "Maíz / Tortillas de maíz",
+        "propiedades": "Seco, ligero, calentamiento ligero. Tradicional en México.",
+        "vata": "Pequeñas cantidades (Seco, puede agravar Vata. Comer calientes con ghee o aceite)",
+        "pitta": "Pequeñas cantidades (Evitar totopos fritos)",
+        "kapha": "Mejor (Excelente por su cualidad seca y ligera)",
+        "preparacion_mexicana": "Tortillas calientes, preferiblemente hechas a mano y con un poco de ghee o aceite para Vata."
+      },
+      {
+        "nombre": "Amaranto mexicano (alegría)",
+        "propiedades": "Ligero, seco, fácil de digerir. Tridóshico.",
+        "vata": "Mejor (Cocido en atole o papilla con especias)",
+        "pitta": "Mejor (Excelente cereal refrescante)",
+        "kapha": "Mejor (Muy bueno debido a su ligereza)",
+        "preparacion_mexicana": "Cocido como cereal caliente con leche de almendras o cabra y cardamomo."
+      },
+      {
+        "nombre": "Semillas de Chía",
+        "propiedades": "Pesado, húmedo, produce mucílago.",
+        "vata": "Mejor (Lubrica el canal digestivo)",
+        "pitta": "Pequeñas cantidades (Calentadora en exceso)",
+        "kapha": "Evitar (Aumenta la humedad y pesadez)",
+        "preparacion_mexicana": "Remojada en agua con limón o en atoles ligeros."
+      }
+    ],
+    "hortalizas": [
+      {
+        "nombre": "Nopal",
+        "propiedades": "Ligeramente frío, amargo, astringente y baboso (mucilaginoso).",
+        "vata": "Pequeñas cantidades (Cocinar bien con comino, ajo y aceite de oliva para contrarrestar la ligereza)",
+        "pitta": "Mejor (Refrescante y pacifica Pitta)",
+        "kapha": "Mejor (Su sabor amargo y astringente ayuda a Kapha, pero debe comerse asado o asado a la plancha para evitar el exceso de baba)",
+        "preparacion_mexicana": "Cocidos con comino y sal de grano, o asados a la plancha con una pizca de orégano."
+      },
+      {
+        "nombre": "Calabacita mexicana (criolla o alargada)",
+        "propiedades": "Dulce, refrescante, ligera y fácil de digerir.",
+        "vata": "Mejor (Cocidas al vapor con ghee o aceite de oliva)",
+        "pitta": "Mejor (Refrescante y dulce, ideal para Pitta)",
+        "kapha": "Pequeñas cantidades (Cocinar con pimienta negra y especias calientes)",
+        "preparacion_mexicana": "Guisadas con elote tierno y cebolla bien cocida."
+      },
+      {
+        "nombre": "Chayote",
+        "propiedades": "Muy ligero, refrescante, diurético y suave.",
+        "vata": "Pequeñas cantidades (Demasiado ligero y diurético; comer bien sazonado con grasas buenas)",
+        "pitta": "Mejor (Excelente para pacificar el calor)",
+        "kapha": "Mejor (Ligero y diurético, ideal para Kapha)",
+        "preparacion_mexicana": "Cocido al vapor con mantequilla clarificada (ghee) y una pizca de sal marina."
+      },
+      {
+        "nombre": "Ejotes",
+        "propiedades": "Dulces, astringentes y ligeros.",
+        "vata": "Pequeñas cantidades (Comer bien cocidos con especias carminativas como comino o asafétida y ghee)",
+        "pitta": "Mejor (Dulces y refrescantes)",
+        "kapha": "Mejor (Ligeros y astringentes, excelentes para Kapha)",
+        "preparacion_mexicana": "Cocidos con especias suaves o salteados con ghee y almendras."
+      },
+      {
+        "nombre": "Jícama",
+        "propiedades": "Fría, crujiente, dulce y húmeda.",
+        "vata": "Evitar (Fría y crujiente, agrava Vata)",
+        "pitta": "Mejor (Refrescante y dulce, excelente en verano)",
+        "kapha": "Evitar (Húmeda y fría, aumenta Kapha)",
+        "preparacion_mexicana": "A temperatura ambiente, en tiras delgadas con un toque de limón (evitar chile en exceso para Pitta)."
+      },
+      {
+        "nombre": "Jitomate / Tomate rojo",
+        "propiedades": "Ácido, caliente, ligeramente pesado.",
+        "vata": "Mejor (Cocido y dulce pacifica Vata)",
+        "pitta": "Evitar (Muy ácido, agrava Pitta. Cocido y sin semillas se puede consumir en cantidades mínimas)",
+        "kapha": "Pequeñas cantidades (Cocido con especias picantes)",
+        "preparacion_mexicana": "Cocido y licuado como base de caldos, sazonado con cilantro u hoja santa."
+      },
+      {
+        "nombre": "Tomatillo verde (Tomate de cáscara)",
+        "propiedades": "Ácido, ligero, refrescante.",
+        "vata": "Evitar (Aumenta Vata debido a su acidez y ligereza)",
+        "pitta": "Evitar (Ácido, agrava Pitta)",
+        "kapha": "Pequeñas cantidades (Cocinado con especias calientes)",
+        "preparacion_mexicana": "Salsas cocidas con cilantro y comino."
+      },
+      {
+        "nombre": "Aguacate",
+        "propiedades": "Aceitoso, pesado, dulce y frío.",
+        "vata": "Mejor (Excelente por su cualidad nutritiva y aceitosa)",
+        "pitta": "Mejor (Nutritivo y refrescante, pero consumir con moderación por su densidad)",
+        "kapha": "Evitar (Muy pesado y aceitoso, aumenta Kapha)",
+        "preparacion_mexicana": "En rebanadas a temperatura ambiente o machacado con cilantro y limón."
+      },
+      {
+        "nombre": "Flor de calabaza y Verdolagas",
+        "propiedades": "Ligeras, refrescantes y nutritivas.",
+        "vata": "Pequeñas cantidades (Cocidas con suficiente aceite/ghee)",
+        "pitta": "Mejor (Refrescantes y suaves)",
+        "kapha": "Mejor (Ligeras y depurativas)",
+        "preparacion_mexicana": "Salteadas con cebolla y sazonadas con epazote."
+      },
+      {
+        "nombre": "Chiles (Poblano, Serrano, Jalapeño, Habanero)",
+        "propiedades": "Muy picantes, calientes y secos.",
+        "vata": "Pequeñas cantidades (El picante agrava Vata en exceso. Usar chiles suaves como el poblano bien cocido)",
+        "pitta": "Evitar (Extremadamente calientes, aumentan el fuego interno)",
+        "kapha": "Mejor (Excelente para estimular el Agni o fuego digestivo lentificado de Kapha)",
+        "preparacion_mexicana": "Chile poblano sudado y pelado (rajas) cocinado con ghee, o chiles serranos en guisados para Kapha."
+      }
+    ],
+    "frutas": [
+      {
+        "nombre": "Chicozapote",
+        "propiedades": "Muy dulce, pesado, frío y nutritivo.",
+        "vata": "Mejor (Nutritivo, calma Vata)",
+        "pitta": "Mejor (Dulce y refrescante, excelente para Pitta)",
+        "kapha": "Evitar (Demasiado dulce y pesado)",
+        "preparacion_mexicana": "Fresco, bien maduro como postre natural a media mañana."
+      },
+      {
+        "nombre": "Tunas (dulces)",
+        "propiedades": "Dulces, astringentes, frías.",
+        "vata": "Mejor (Pacifica Vata por su dulzura, preferir a temperatura ambiente)",
+        "pitta": "Mejor (Excelente fruta refrescante para Pitta)",
+        "kapha": "Pequeñas cantidades (Consumir con moderación debido a su contenido de agua y semillas)",
+        "preparacion_mexicana": "Frescas y maduras, masticando bien o coladas en agua natural sin azúcar."
+      },
+      {
+        "nombre": "Pitaya / Pitahaya (dulces)",
+        "propiedades": "Dulce, refrescante, ligera.",
+        "vata": "Mejor (Fácil de digerir y refrescante)",
+        "pitta": "Mejor (Excelente para calmar el calor de Pitta)",
+        "kapha": "Pequeñas cantidades (Moderación por su dulzura)",
+        "preparacion_mexicana": "Fresca, bien madura."
+      },
+      {
+        "nombre": "Piña",
+        "propiedades": "Dulce si está muy madura; ácida si no lo está. Caliente.",
+        "vata": "Mejor (Si está muy madura y dulce. Evitar la ácida)",
+        "pitta": "Evitar (Si es ácida. Si es muy dulce se permite en pequeñas cantidades)",
+        "kapha": "Pequeñas cantidades (Si es ácida o poco madura, ayuda a Kapha, pero con moderación)",
+        "preparacion_mexicana": "Asada a la plancha con una pizca de canela para reducir la acidez."
+      },
+      {
+        "nombre": "Papaya",
+        "propiedades": "Caliente, ligera, dulce, rica en enzimas digestivas.",
+        "vata": "Mejor (Excelente fruta calentadora para Vata)",
+        "pitta": "Pequeñas cantidades (Es caliente, por lo que Pitta debe consumirla madura y con moderación)",
+        "kapha": "Mejor (Fomenta la digestión lenta de Kapha)",
+        "preparacion_mexicana": "En cubos a temperatura ambiente con unas gotas de limón."
+      },
+      {
+        "nombre": "Mango (Ataulfo o Petacón)",
+        "propiedades": "Muy dulce, pesado, caliente y nutritivo.",
+        "vata": "Mejor (Calma Vata por su densidad y dulzura)",
+        "pitta": "Mejor (Si está muy dulce y maduro. Evitar mango verde o ácido)",
+        "kapha": "Evitar (Demasiado pesado y dulce)",
+        "preparacion_mexicana": "Consumir solo, maduro, nunca frío de refrigerador."
+      },
+      {
+        "nombre": "Mamey",
+        "propiedades": "Muy dulce, pesado y cremoso.",
+        "vata": "Mejor (Nutre y da estabilidad a Vata)",
+        "pitta": "Mejor (Dulce y pacificador)",
+        "kapha": "Evitar (Demasiado pesado y grasoso)",
+        "preparacion_mexicana": "Fresco, bien maduro."
+      }
+    ],
+    "legumbres": [
+      {
+        "nombre": "Frijoles Negros y Bayos",
+        "propiedades": "Astringentes, secos, pesados.",
+        "vata": "Evitar (Altamente productores de gas. Si se consumen, deben ser remojados toda la noche, muy bien cocidos y sazonados con abundante epazote, comino, ghee y jengibre)",
+        "pitta": "Pequeñas cantidades (Consumir bien cocidos con cilantro y comino)",
+        "kapha": "Mejor (Su cualidad astringente y seca es muy buena para Kapha, cocinar con especias picantes)",
+        "preparacion_mexicana": "Remojados 12 horas, cocidos con epazote, ajo y comino."
+      }
+    ],
+    "hierbas_y_especias": [
+      {
+        "nombre": "Epazote",
+        "propiedades": "Picante, caliente, seco, carminativo (elimina gases).",
+        "vata": "Mejor (Excelente para digerir legumbres y evitar gases)",
+        "pitta": "Pequeñas cantidades (Usar con moderación por ser caliente)",
+        "kapha": "Mejor (Excelente especia calentadora y digestiva)",
+        "preparacion_mexicana": "Añadido a caldos, frijoles y guisos de calabacitas o nopales."
+      },
+      {
+        "nombre": "Cilantro",
+        "propiedades": "Refrescante, dulce, digestivo.",
+        "vata": "Mejor (Ayuda a equilibrar especias calientes)",
+        "pitta": "Mejor (La mejor hierba fresca para pacificar el calor)",
+        "kapha": "Mejor (Excelente digestivo suave)",
+        "preparacion_mexicana": "Picado fresco sobre sopas, ensaladas o guisados al finalizar la cocción."
+      },
+      {
+        "nombre": "Hoja Santa",
+        "propiedades": "Picante, caliente, digestiva y expectorante.",
+        "vata": "Mejor (Calienta el estómago)",
+        "pitta": "Pequeñas cantidades (Caliente, usar con moderación)",
+        "kapha": "Mejor (Ayuda a eliminar moco y estimula el metabolismo)",
+        "preparacion_mexicana": "Usada para envolver pescados al vapor o picada en caldos verdes."
+      },
+      {
+        "nombre": "Orégano mexicano",
+        "propiedades": "Picante, caliente, seco y digestivo.",
+        "vata": "Mejor (Excelente digestivo y carminativo)",
+        "pitta": "Pequeñas cantidades (Caliente)",
+        "kapha": "Mejor (Excelente estimulante digestivo)",
+        "preparacion_mexicana": "Espolvoreado seco sobre nopales o guisados."
+      }
+    ]
+  }
+}

@@ -1,0 +1,773 @@
+/* Style CSS for VEDAMCI Diets 2026 */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+:root {
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Outfit', sans-serif;
+    
+    /* Global Variables - Default VEDAMCI (Tridoshic/Gold Theme) */
+    --color-primary: #8e7355;
+    --color-primary-light: #f7f3ed;
+    --color-primary-dark: #6e583f;
+    --color-accent: #d4af37;
+    --color-text: #2c2520;
+    --color-bg-body: #faf8f5;
+    --color-card-bg: #ffffff;
+    --color-border: #ebdcc9;
+    
+    --shadow-soft: 0 10px 30px rgba(142, 115, 85, 0.08);
+    --shadow-hover: 0 15px 35px rgba(142, 115, 85, 0.15);
+    
+    --badge-mejor-bg: #e8f5e9;
+    --badge-mejor-text: #2e7d32;
+    --badge-moderado-bg: #fff3e0;
+    --badge-moderado-text: #ef6c00;
+    --badge-evitar-bg: #ffebee;
+    --badge-evitar-text: #c62828;
+    
+    --transition-smooth: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Dosha Specific Themes */
+body.theme-vata {
+    --color-primary: #3d6a45; /* Deep Sage */
+    --color-primary-light: #f1f6f2;
+    --color-primary-dark: #27492d;
+    --color-accent: #a3b899;
+    --color-text: #252e26;
+    --color-bg-body: #f7faf8;
+    --color-border: #d2ded0;
+    --shadow-soft: 0 10px 30px rgba(61, 106, 69, 0.06);
+    --shadow-hover: 0 15px 35px rgba(61, 106, 69, 0.12);
+}
+
+body.theme-pitta {
+    --color-primary: #b33927; /* Warm Terracotta / Crimson */
+    --color-primary-light: #fdf5f4;
+    --color-primary-dark: #822214;
+    --color-accent: #e5a93b; /* Warm Gold */
+    --color-text: #331f1c;
+    --color-bg-body: #fefaf9;
+    --color-border: #f3d4ce;
+    --shadow-soft: 0 10px 30px rgba(179, 57, 39, 0.06);
+    --shadow-hover: 0 15px 35px rgba(179, 57, 39, 0.12);
+}
+
+body.theme-kapha {
+    --color-primary: #2b5c74; /* Deep Ocean Teal */
+    --color-primary-light: #edf4f7;
+    --color-primary-dark: #1b3d4f;
+    --color-accent: #78a1bb;
+    --color-text: #1b262c;
+    --color-bg-body: #f4f8fa;
+    --color-border: #cfe0e8;
+    --shadow-soft: 0 10px 30px rgba(43, 92, 116, 0.06);
+    --shadow-hover: 0 15px 35px rgba(43, 92, 116, 0.12);
+}
+
+body.theme-vata-pitta {
+    --color-primary: #7d5738; /* Bronze Green/Brown */
+    --color-primary-light: #faf5f0;
+    --color-primary-dark: #523720;
+    --color-accent: #d2a454;
+    --color-text: #2e2218;
+    --color-bg-body: #fcfaf7;
+    --color-border: #ebdcc9;
+}
+
+body.theme-vata-kapha {
+    --color-primary: #3c5266; /* Steel Blue-Grey */
+    --color-primary-light: #f2f5f7;
+    --color-primary-dark: #243545;
+    --color-accent: #7ca5b8;
+    --color-text: #1d252e;
+    --color-bg-body: #f6f8f9;
+    --color-border: #d0dde3;
+}
+
+body.theme-pitta-kapha {
+    --color-primary: #2b6b55; /* Forest Teal */
+    --color-primary-light: #f0f7f4;
+    --color-primary-dark: #194535;
+    --color-accent: #d1b46a;
+    --color-text: #1a2923;
+    --color-bg-body: #f7faf8;
+    --color-border: #cfe5dc;
+}
+
+body.theme-tridoshica {
+    --color-primary: #6c4e85; /* Royal Amethyst/Purple */
+    --color-primary-light: #f7f4fa;
+    --color-primary-dark: #4b3260;
+    --color-accent: #e5b33b;
+    --color-text: #261c30;
+    --color-bg-body: #faf8fc;
+    --color-border: #ebddef;
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg-body);
+    color: var(--color-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: var(--transition-smooth);
+}
+
+/* Layout Structure */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Navigation Sidebar */
+.sidebar {
+    width: 320px;
+    background-color: var(--color-primary-dark);
+    color: #ffffff;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 100;
+    transition: var(--transition-smooth);
+}
+
+.brand-section {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-logo {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1rem;
+    background: radial-gradient(circle, var(--color-accent) 0%, rgba(255,255,255,0.1) 70%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.brand-name {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #ffffff;
+}
+
+.brand-subtitle {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-accent);
+    margin-top: 0.2rem;
+}
+
+.menu-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+}
+
+.diet-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+}
+
+.diet-menu-item button {
+    width: 100%;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.75);
+    padding: 0.9rem 1.2rem;
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.diet-menu-item button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    padding-left: 1.5rem;
+}
+
+.diet-menu-item.active button {
+    background-color: var(--color-accent);
+    color: var(--color-primary-dark);
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.sidebar-footer a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: var(--transition-smooth);
+}
+
+.sidebar-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    margin-left: 320px;
+    padding: 3rem 4rem;
+    max-width: 1200px;
+    transition: var(--transition-smooth);
+}
+
+/* Action Controls Header */
+.controls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    background-color: var(--color-card-bg);
+    padding: 1.2rem 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--color-border);
+}
+
+.nav-hint {
+    font-size: 0.9rem;
+    color: rgba(0,0,0,0.5);
+}
+
+.btn-print {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border: none;
+    padding: 0.8rem 1.6rem;
+    border-radius: 12px;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-print:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn-print svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* Diet Template Section */
+.diet-header {
+    margin-bottom: 3.5rem;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, rgba(255,255,255,0.4) 100%);
+    border-radius: 24px;
+    border: 1px solid var(--color-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.diet-header::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);
+    opacity: 0.15;
+    border-radius: 50%;
+}
+
+.diet-title {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    color: var(--color-primary-dark);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.diet-description {
+    font-size: 1.15rem;
+    color: var(--color-text);
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    font-weight: 300;
+}
+
+/* Flavors & Qualities Block */
+.diet-attributes {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.attribute-tag {
+    background-color: var(--color-card-bg);
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attribute-tag.mejor {
+    border-left: 4px solid var(--badge-mejor-text);
+}
+
+.attribute-tag.evitar {
+    border-left: 4px solid var(--badge-evitar-text);
+}
+
+.attribute-tag strong {
+    color: var(--color-primary-dark);
+}
+
+/* Category Grid */
+.categories-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+}
+
+.category-card {
+    background-color: var(--color-card-bg);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--color-border);
+    transition: var(--transition-smooth);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-primary-light);
+}
+
+.category-title {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--color-primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.category-description {
+    font-size: 0.95rem;
+    color: rgba(0, 0, 0, 0.6);
+    font-style: italic;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    background-color: var(--color-primary-light);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--color-primary);
+}
+
+/* List Formatting Instead of Commas */
+.lists-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 900px) {
+    .lists-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.list-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.column-title-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    width: fit-content;
+}
+
+.column-title-badge.mejor {
+    background-color: var(--badge-mejor-bg);
+    color: var(--badge-mejor-text);
+}
+
+.column-title-badge.moderado {
+    background-color: var(--badge-moderado-bg);
+    color: var(--badge-moderado-text);
+}
+
+.column-title-badge.evitar {
+    background-color: var(--badge-evitar-bg);
+    color: var(--badge-evitar-text);
+}
+
+.food-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.food-item {
+    background-color: var(--color-primary-light);
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    transition: var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.food-item:hover {
+    background-color: #ffffff;
+    border-color: var(--color-border);
+    transform: translateX(5px);
+}
+
+.food-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-primary-dark);
+}
+
+.food-note {
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.65);
+    line-height: 1.4;
+}
+
+/* Mexico Foods Tag */
+.mexico-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background-color: #e0f2f1;
+    color: #00796b;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    width: fit-content;
+    margin-top: 0.3rem;
+}
+
+/* Loading State */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+}
+
+/* Footer Section */
+.diet-footer-info {
+    margin-top: 4rem;
+    padding: 2.5rem;
+    background-color: var(--color-card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    text-align: center;
+    font-size: 0.95rem;
+    color: rgba(0,0,0,0.6);
+    box-shadow: var(--shadow-soft);
+}
+
+.diet-footer-info p {
+    margin-bottom: 0.8rem;
+}
+
+.diet-footer-info a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.diet-footer-info a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   PRINT OPTIMIZATION (@media print)
+   ========================================================================== */
+@media print {
+    /* Set page margins */
+    @page {
+        margin: 1.2cm 1.5cm;
+    }
+    
+    /* Hide all web interactive elements */
+    .sidebar,
+    .controls-header,
+    .btn-print,
+    .nav-hint,
+    .sidebar-footer {
+        display: none !important;
+    }
+    
+    /* Layout adjustments for print */
+    .app-container {
+        display: block !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 9.5pt;
+    }
+    
+    /* Elegant Print Header */
+    .diet-header {
+        background: none !important;
+        border: none !important;
+        border-bottom: 3px double var(--color-primary, #000000) !important;
+        padding: 0 0 1.2rem 0 !important;
+        margin-bottom: 1.8rem !important;
+        text-align: center !important;
+        border-radius: 0 !important;
+    }
+    
+    .diet-title {
+        font-size: 22pt !important;
+        color: #000000 !important;
+        margin-bottom: 0.4rem !important;
+        text-align: center !important;
+    }
+    
+    .diet-description {
+        font-size: 10pt !important;
+        margin: 0 auto 0.8rem auto !important;
+        max-width: 90% !important;
+        text-align: center !important;
+        font-style: italic !important;
+    }
+    
+    .diet-attributes {
+        justify-content: center !important;
+        gap: 1.5rem !important;
+        margin-top: 0.8rem !important;
+    }
+    
+    .attribute-tag {
+        border: 1px solid #999999 !important;
+        box-shadow: none !important;
+        background-color: #ffffff !important;
+        font-size: 8.5pt !important;
+        padding: 0.2rem 0.8rem !important;
+        border-left: 4px solid var(--color-primary, #000000) !important;
+        border-radius: 4px !important;
+    }
+    
+    /* Category print styles */
+    .category-card {
+        page-break-inside: avoid !important; /* Avoid breaking cards mid-page */
+        box-shadow: none !important;
+        border: none !important;
+        border-bottom: 1px dashed #cccccc !important;
+        padding: 1.2rem 0 !important;
+        margin-bottom: 0.5rem !important;
+        border-radius: 0 !important;
+    }
+    
+    .category-header {
+        border-bottom: 1.5px solid var(--color-primary, #000000) !important;
+        margin-bottom: 0.8rem !important;
+        padding-bottom: 0.2rem !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+    
+    .category-title {
+        font-size: 13pt !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
+    }
+    
+    .category-description {
+        background-color: #f7f7f7 !important;
+        border-left: 3px solid var(--color-primary, #000000) !important;
+        padding: 0.5rem 0.8rem !important;
+        font-size: 8.5pt !important;
+        margin-bottom: 1rem !important;
+        color: #444444 !important;
+    }
+    
+    /* Dynamic Grid Layout in print */
+    .lists-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+        gap: 1.2rem !important;
+    }
+    
+    .list-column {
+        gap: 0.6rem !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    
+    .column-title-badge {
+        background: none !important;
+        border: 1px solid var(--color-primary, #000000) !important;
+        color: #000000 !important;
+        padding: 0.15rem 0.4rem !important;
+        font-size: 7.5pt !important;
+        border-radius: 4px !important;
+        font-weight: 700 !important;
+        margin-bottom: 0.3rem !important;
+    }
+    
+    .food-list {
+        gap: 0.4rem !important;
+    }
+    
+    /* Clean list format with bullets */
+    .food-item {
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0.1rem 0 !important;
+        margin-bottom: 0.15rem !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        display: list-item !important;
+        list-style-type: square !important;
+        margin-left: 1.1rem !important;
+    }
+    
+    /* Flow name and notes inline */
+    .food-name {
+        font-size: 9pt !important;
+        color: #000000 !important;
+        font-weight: 600 !important;
+        display: inline !important;
+    }
+    
+    .food-note {
+        font-size: 8pt !important;
+        color: #444444 !important;
+        display: inline !important;
+    }
+    
+    .food-note::before {
+        content: " — " !important;
+        font-weight: normal !important;
+    }
+    
+    .mexico-tag {
+        border: 1px solid #00796b !important;
+        background-color: #ffffff !important;
+        color: #00796b !important;
+        font-size: 5.5pt !important;
+        padding: 0 0.2rem !important;
+        display: inline-block !important;
+        margin-left: 0.3rem !important;
+        margin-top: 0 !important;
+        vertical-align: middle !important;
+    }
+    
+    .diet-footer-info {
+        border: none !important;
+        border-top: 1.5px solid var(--color-primary, #000000) !important;
+        box-shadow: none !important;
+        padding: 1rem 0 0 0 !important;
+        margin-top: 2rem !important;
+        font-size: 8pt !important;
+        color: #444444 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    
+    /* Strict rules to prevent page break issues */
+    h2, h3, .category-header, .column-title-badge {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+}
