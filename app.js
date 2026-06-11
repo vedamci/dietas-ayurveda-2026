@@ -36,9 +36,52 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSidebar();
         renderDieta(currentDietKey);
 
-        // Evento de impresión
+        // Evento de impresión a PDF (Maquetación web exacta)
         printBtn.addEventListener('click', () => {
-            window.print();
+            const element = document.getElementById('diet-content');
+            
+            // Indicador de carga visual en el botón
+            const originalText = printBtn.innerHTML;
+            printBtn.disabled = true;
+            printBtn.innerHTML = `
+                <svg viewBox="0 0 50 50" style="width:18px;height:18px;animation:spin 1s linear infinite;margin-right:8px;display:inline-block;vertical-align:middle;">
+                    <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="1, 150" stroke-dashoffset="0" stroke-linecap="round"></circle>
+                </svg>
+                <span>Generando PDF...</span>
+            `;
+
+            // Agregar estilos de animación rápidos si no existen
+            if (!document.getElementById('spin-style')) {
+                const style = document.createElement('style');
+                style.id = 'spin-style';
+                style.innerHTML = '@keyframes spin { 100% { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+            }
+
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     `Dieta_${currentDietKey}_VEDAMCI_2026.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2.5, // Mayor resolución para texto ultra nítido
+                    useCORS: true, 
+                    logging: false,
+                    letterRendering: true
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css'] }
+            };
+
+            // Generar PDF y restaurar botón
+            html2pdf().set(opt).from(element).save().then(() => {
+                printBtn.disabled = false;
+                printBtn.innerHTML = originalText;
+            }).catch(err => {
+                console.error('Error al generar PDF:', err);
+                printBtn.disabled = false;
+                printBtn.innerHTML = originalText;
+                alert('Ocurrió un error al generar el PDF.');
+            });
         });
     }
 
