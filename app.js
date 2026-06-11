@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div');
         container.id = 'pdf-render-container';
         container.style.cssText = `
-            position: fixed; top: 0; left: -9999px; z-index: -9999;
+            position: fixed; top: 0; left: 0; z-index: 99999;
             width: 880px; 
             background: #ffffff;
             font-family: 'Outfit', Arial, Helvetica, sans-serif;
@@ -279,6 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
             line-height: 1.5;
             font-size: 13px;
             padding: 30px 35px;
+            overflow: auto;
+            max-height: 100vh;
         `;
 
         // --- HEADER ---
