@@ -60,11 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Construir HTML dedicado para PDF con estilos inline
             const pdfContainer = buildPdfHtml(dieta, currentDietKey);
             
-            // Para evitar que html2canvas falle por posicionamiento "fixed" o "absolute" en el elemento capturado,
-            // creamos un wrapper contenedor que se posiciona fuera de pantalla (left: -9999px).
-            // Pasamos a html2pdf el elemento hijo (pdfContainer) que tiene flujo de diseño normal (sin posicionamiento).
+            // Para evitar que html2canvas falle por posicionamiento "fixed" o "absolute" en el elemento capturado
+            // o por coordenadas negativas de bounding box (si se usa left: -9999px), creamos un wrapper
+            // que colocamos en left: 0, top: 0 pero detrás del contenedor principal usando z-index: -100.
             const wrapper = document.createElement('div');
-            wrapper.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 900px; overflow: hidden; height: auto;';
+            wrapper.style.cssText = 'position: absolute; left: 0; top: 0; width: 900px; z-index: -100; overflow: hidden; height: auto; background: #ffffff;';
             wrapper.appendChild(pdfContainer);
             document.body.appendChild(wrapper);
 

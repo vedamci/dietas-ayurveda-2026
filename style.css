@@ -130,6 +130,9 @@ body {
 .app-container {
     display: flex;
     min-height: 100vh;
+    position: relative;
+    z-index: 10;
+    background-color: var(--color-bg-body);
 }
 
 /* Navigation Sidebar */
