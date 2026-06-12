@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarMenu = document.getElementById('sidebar-menu');
     const dietContent = document.getElementById('diet-content');
     const printBtn = document.getElementById('print-btn');
-    const PDF_RENDER_WIDTH = 760;
 
     // Nombres de alimentos mexicanos para identificar y ponerles la etiqueta "México"
     const listaAlimentosMexicanos = [
@@ -37,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSidebar();
         renderDieta(currentDietKey);
 
-        // Evento de impresión a PDF (Genera HTML dedicado para PDF)
+        // Evento de descarga a PDF vectorial
         printBtn.addEventListener('click', () => {
             const dieta = dietasData[currentDietKey];
             if (!dieta) return;
@@ -58,55 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.head.appendChild(style);
             }
 
-            // Construir una plantilla dedicada para PDF
-            const pdfContainer = buildPdfHtml(dieta, currentDietKey);
-
-            // Creamos un contenedor wrapper posicionado fuera de la pantalla
-            // para que el navegador calcule el layout sin que el usuario lo vea.
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'absolute';
-            wrapper.style.left = '-9999px';
-            wrapper.style.top = '0';
-            wrapper.style.width = `${PDF_RENDER_WIDTH}px`;
-            wrapper.style.overflow = 'hidden';
-            
-            wrapper.appendChild(pdfContainer);
-            document.body.appendChild(wrapper);
-
-            const opt = {
-                margin:       [10, 11, 12, 11],
-                filename:     `Dieta_${currentDietKey}_VEDAMCI_2026.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2,
-                    useCORS: true, 
-                    backgroundColor: '#ffffff',
-                    logging: false,
-                    letterRendering: true,
-                    windowWidth: PDF_RENDER_WIDTH,
-                    width: PDF_RENDER_WIDTH
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-                pagebreak:    {
-                    mode: ['css', 'legacy'],
-                    avoid: ['.pdf-keep-together', '.pdf-food-row', '.pdf-column-heading']
-                }
-            };
-
-            // Damos un pequeño delay (150ms) para asegurarnos de que el navegador calcule el layout antes de capturar
             setTimeout(() => {
-                html2pdf().set(opt).from(pdfContainer).save().then(() => {
-                    document.body.removeChild(wrapper);
-                    printBtn.disabled = false;
-                    printBtn.innerHTML = originalText;
-                }).catch(err => {
+                try {
+                    downloadDietaPdf(dieta, currentDietKey);
+                } catch (err) {
                     console.error('Error al generar PDF:', err);
-                    if (wrapper.parentNode) document.body.removeChild(wrapper);
+                    alert('Ocurrió un error al generar el PDF.');
+                } finally {
                     printBtn.disabled = false;
                     printBtn.innerHTML = originalText;
-                    alert('Ocurrió un error al generar el PDF.');
-                });
-            }, 150);
+                }
+            }, 50);
         });
     }
 
@@ -145,6 +106,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return listaAlimentosMexicanos.some(keyword => nombreLower.includes(keyword));
     }
 
+    function getFlavorSummary(dieta) {
+        const sabores = dieta.sabores || {};
+        const toList = value => Array.isArray(value) ? value.filter(Boolean) : [];
+        const mejor = toList(sabores.mejor);
+        const moderado = toList(sabores.moderado);
+        const evitar = toList(sabores.evitar);
+        const mejorText = [
+            mejor.join(', '),
+            moderado.length ? `Moderado: ${moderado.join(', ')}` : ''
+        ].filter(Boolean).join(' · ') || 'Según evaluación individual';
+
+        return {
+            mejorText,
+            evitarText: evitar.length ? evitar.join(', ') : (sabores.nota || 'Evitar excesos y mantener proporciones moderadas.'),
+            evitarLabel: evitar.length ? 'Evitar' : 'Nota'
+        };
+    }
+
     // Renderizar una dieta específica
     function renderDieta(key) {
         const dieta = dietasData[key];
@@ -156,8 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add(themeClass);
 
         // Crear cabecera
-        let saboresMejorHtml = dieta.sabores.mejor.join(', ');
-        let saboresEvitarHtml = dieta.sabores.evitar.join(', ');
+        const flavorSummary = getFlavorSummary(dieta);
+        let saboresMejorHtml = flavorSummary.mejorText;
+        let saboresEvitarHtml = flavorSummary.evitarText;
 
         let headerHtml = `
             <div class="diet-header">
@@ -168,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <strong>Mejor:</strong> <span>${saboresMejorHtml}</span>
                     </div>
                     <div class="attribute-tag evitar">
-                        <strong>Evitar:</strong> <span>${saboresEvitarHtml}</span>
+                        <strong>${flavorSummary.evitarLabel}:</strong> <span>${saboresEvitarHtml}</span>
                     </div>
                 </div>
             </div>
@@ -271,24 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    function escapeHtml(value) {
-        const escapeMap = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-
-        return String(value ?? '').replace(/[&<>"']/g, char => escapeMap[char]);
-    }
-
-    // ============================================================
-    // Construir HTML dedicado para exportar a PDF
-    // Estructura estable para A4, márgenes consistentes y cortes limpios
-    // ============================================================
-    function buildPdfHtml(dieta, key) {
-        // Colores por dosha (sólidos, sin rgba ni gradientes)
+    function getPdfTheme(key) {
         const doshaColors = {
             'Vata':        { primary: '#3d6a45', light: '#eef5ef', dark: '#27492d', accent: '#a3b899' },
             'Pitta':       { primary: '#b33927', light: '#fbebe8', dark: '#822214', accent: '#d69b35' },
@@ -298,167 +261,535 @@ document.addEventListener('DOMContentLoaded', () => {
             'Pitta-Kapha': { primary: '#2b6b55', light: '#e9f4ef', dark: '#194535', accent: '#c4a75c' },
             'Tridoshica':  { primary: '#6c4e85', light: '#f0eaf5', dark: '#4b3260', accent: '#d2a431' }
         };
-        const c = doshaColors[key] || doshaColors['Tridoshica'];
-        const neutral = {
+
+        return {
+            ...(doshaColors[key] || doshaColors['Tridoshica']),
             ink: '#2b2622',
             muted: '#625b54',
             soft: '#f8f5f1',
-            line: '#e6ddd3'
+            line: '#e6ddd3',
+            white: '#ffffff',
+            green: '#2e7d32',
+            orange: '#b86200',
+            red: '#c62828',
+            teal: '#00796b'
         };
+    }
 
-        const container = document.createElement('div');
-        container.id = 'pdf-render-container';
-        container.style.cssText = `
-            width: ${PDF_RENDER_WIDTH}px;
-            background: #ffffff;
-            font-family: Arial, Helvetica, sans-serif;
-            color: ${neutral.ink};
-            line-height: 1.42;
-            font-size: 12px;
-            padding: 0;
-            box-sizing: border-box;
-        `;
+    function downloadDietaPdf(dieta, key) {
+        const bytes = createDietaPdfBytes(dieta, key);
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Dieta_${key}_VEDAMCI_2026.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1200);
+    }
 
-        const styles = `
-            <style>
-                #pdf-render-container * {
-                    box-sizing: border-box;
-                }
+    function createDietaPdfBytes(dieta, key) {
+        const theme = getPdfTheme(key);
+        const pdf = createPdfRenderer(theme);
 
-                #pdf-render-container .pdf-keep-together,
-                #pdf-render-container .pdf-food-row,
-                #pdf-render-container .pdf-column-heading {
-                    page-break-inside: avoid;
-                    break-inside: avoid;
-                }
-
-                #pdf-render-container .pdf-section-heading,
-                #pdf-render-container .pdf-column-heading {
-                    page-break-after: avoid;
-                    break-after: avoid;
-                }
-
-                #pdf-render-container .pdf-category {
-                    page-break-inside: auto;
-                    break-inside: auto;
-                }
-            </style>
-        `;
-
-        const saboresMejor = escapeHtml(dieta.sabores.mejor.join(', '));
-        const saboresEvitar = escapeHtml(dieta.sabores.evitar.join(', '));
-
-        let html = styles + `
-            <section class="pdf-cover pdf-keep-together" style="border:1px solid ${neutral.line}; border-top:7px solid ${c.primary}; margin-bottom:18px; background:${neutral.soft};">
-                <div style="padding:20px 24px 18px 24px;">
-                    <table style="width:100%; border-collapse:collapse; margin-bottom:14px;">
-                        <tr>
-                            <td style="width:50%; vertical-align:middle; color:${c.dark}; font-size:11px; font-weight:700;">VEDAMCI</td>
-                            <td style="width:50%; vertical-align:middle; text-align:right; color:${neutral.muted}; font-size:10px;">Ayurveda México 2026</td>
-                        </tr>
-                    </table>
-                    <h1 style="font-family:Georgia,'Times New Roman',serif; font-size:31px; line-height:1.08; color:${c.dark}; margin:0 0 10px 0; font-weight:700;">${escapeHtml(dieta.nombre)}</h1>
-                    <p style="font-size:12.3px; line-height:1.55; color:${neutral.muted}; margin:0 0 16px 0; max-width:690px;">${escapeHtml(dieta.descripcion)}</p>
-                    <table style="width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed;">
-                        <tr>
-                            <td style="width:50%; vertical-align:top; padding:10px 12px; background:#ffffff; border-left:4px solid #2e7d32; border-top:1px solid ${neutral.line}; border-bottom:1px solid ${neutral.line}; border-right:6px solid ${neutral.soft};">
-                                <div style="font-size:9px; font-weight:700; color:#2e7d32; margin-bottom:4px;">Mejor</div>
-                                <div style="font-size:11px; color:${neutral.ink}; line-height:1.42;">${saboresMejor}</div>
-                            </td>
-                            <td style="width:50%; vertical-align:top; padding:10px 12px; background:#ffffff; border-left:4px solid #c62828; border-top:1px solid ${neutral.line}; border-bottom:1px solid ${neutral.line};">
-                                <div style="font-size:9px; font-weight:700; color:#c62828; margin-bottom:4px;">Evitar</div>
-                                <div style="font-size:11px; color:${neutral.ink}; line-height:1.42;">${saboresEvitar}</div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </section>
-        `;
-
-        function renderPdfFoodRows(items) {
-            return items.map(item => {
-                const esMex = esAlimentoMexicano(item.alimento);
-                const noteHtml = item.nota
-                    ? `<div style="font-size:10.3px; color:${neutral.muted}; line-height:1.34; margin-top:1px;">${escapeHtml(item.nota)}</div>`
-                    : '';
-                const mexTag = esMex
-                    ? `<span style="display:inline-block; font-size:8px; line-height:1; font-weight:700; color:#00796b; border:1px solid #80b8ad; padding:2px 4px; margin-left:5px; vertical-align:1px;">MX</span>`
-                    : '';
-
-                return `
-                    <div class="pdf-food-row" style="padding:5px 0 6px 0; border-bottom:1px solid ${neutral.line};">
-                        <div style="font-size:11.3px; line-height:1.28; font-weight:700; color:${c.dark};">${escapeHtml(item.alimento)}${mexTag}</div>
-                        ${noteHtml}
-                    </div>
-                `;
-            }).join('');
-        }
+        drawPdfCover(pdf, dieta, theme);
 
         Object.keys(dieta.categorias).forEach((catName, index) => {
-            const cat = dieta.categorias[catName];
-            const sectionNumber = String(index + 1).padStart(2, '0');
-
-            html += `
-                <section class="pdf-category" style="margin:0 0 17px 0; padding:0 0 14px 0; border-bottom:1px solid ${neutral.line};">
-                    <div class="pdf-section-heading pdf-keep-together" style="display:table; width:100%; border-collapse:collapse; margin-bottom:9px;">
-                        <div style="display:table-cell; width:38px; vertical-align:middle; color:${c.primary}; font-size:10px; font-weight:700; border-top:2px solid ${c.primary}; padding-top:6px;">${sectionNumber}</div>
-                        <div style="display:table-cell; vertical-align:middle; border-top:2px solid ${c.primary}; padding-top:4px;">
-                            <h2 style="font-family:Georgia,'Times New Roman',serif; font-size:19px; line-height:1.16; color:${c.dark}; margin:0; font-weight:700;">${escapeHtml(catName)}</h2>
-                        </div>
-                    </div>
-            `;
-
-            if (cat.descripcion_general) {
-                html += `
-                    <div class="pdf-keep-together" style="background:${c.light}; border-left:4px solid ${c.primary}; padding:8px 11px; margin-bottom:11px; font-size:11px; color:${neutral.muted}; line-height:1.42;">
-                        ${escapeHtml(cat.descripcion_general)}
-                    </div>
-                `;
-            }
-
-            const columns = [];
-            if (cat.mejor && cat.mejor.length > 0) {
-                columns.push({ title: 'Mejor / recomendados', items: cat.mejor, color: '#2e7d32', bgColor: '#edf7ee' });
-            }
-            if (cat.moderado && cat.moderado.length > 0) {
-                columns.push({ title: 'Pequeñas cantidades', items: cat.moderado, color: '#b86200', bgColor: '#fff4e3' });
-            }
-            if (cat.evitar && cat.evitar.length > 0) {
-                columns.push({ title: 'Evitar', items: cat.evitar, color: '#c62828', bgColor: '#fdebed' });
-            }
-
-            if (columns.length > 0) {
-                const colWidth = 100 / columns.length;
-                html += `<table style="width:100%; border-collapse:collapse; table-layout:fixed;"><tr>`;
-
-                columns.forEach((col, idx) => {
-                    html += `
-                        <td style="width:${colWidth}%; vertical-align:top; padding:0 ${idx < columns.length - 1 ? '8px' : '0'} 0 ${idx > 0 ? '8px' : '0'};">
-                            <div class="pdf-column-heading" style="font-size:9px; line-height:1.1; font-weight:700; color:${col.color}; background:${col.bgColor}; border:1px solid ${col.color}; border-radius:4px; padding:5px 7px; margin-bottom:5px;">
-                                ${escapeHtml(col.title)}
-                            </div>
-                            ${renderPdfFoodRows(col.items)}
-                        </td>
-                    `;
-                });
-
-                html += `</tr></table>`;
-            }
-
-            html += `
-                </section>
-            `;
+            drawPdfCategory(pdf, catName, dieta.categorias[catName], index + 1, theme);
         });
 
-        html += `
-            <footer class="pdf-keep-together" style="margin-top:18px; padding:12px 0 0 0; border-top:2px solid ${c.primary}; text-align:center; color:${neutral.muted}; font-size:10.5px; line-height:1.45;">
-                <div>Estas dietas se basan en los principios de la medicina Ayurvédica tradicional, adaptadas con alimentos locales mexicanos.</div>
-                <div style="margin-top:4px; color:${c.dark}; font-weight:700;">Contacto VEDAMCI · Cel: 3311651870 · vedamci.com.mx</div>
-            </footer>
-        `;
+        drawPdfClosingNote(pdf, theme);
+        return pdf.finish();
+    }
 
-        container.innerHTML = html;
-        return container;
+    function createPdfRenderer(theme) {
+        const page = {
+            width: 595.28,
+            height: 841.89,
+            marginTop: 38,
+            marginRight: 42,
+            marginBottom: 48,
+            marginLeft: 42
+        };
+        const pages = [];
+        let stream = '';
+        let y = page.marginTop;
+
+        function append(command) {
+            stream += command;
+        }
+
+        function addPage() {
+            if (stream) {
+                pages.push(stream);
+            }
+            stream = '';
+            y = page.marginTop;
+        }
+
+        function ensureSpace(height) {
+            if (y + height > page.height - page.marginBottom) {
+                addPage();
+            }
+        }
+
+        function rect(x, yTop, width, height, fill, stroke, lineWidth = 0.75) {
+            const yPdf = page.height - yTop - height;
+            const operation = fill && stroke ? 'B' : fill ? 'f' : 'S';
+            let command = 'q\n';
+            if (fill) command += `${pdfColor(fill)} rg\n`;
+            if (stroke) command += `${pdfColor(stroke)} RG\n`;
+            command += `${formatNumber(lineWidth)} w\n`;
+            command += `${formatNumber(x)} ${formatNumber(yPdf)} ${formatNumber(width)} ${formatNumber(height)} re ${operation}\nQ\n`;
+            append(command);
+        }
+
+        function line(x1, y1Top, x2, y2Top, color, lineWidth = 0.75) {
+            append(`q\n${pdfColor(color)} RG\n${formatNumber(lineWidth)} w\n${formatNumber(x1)} ${formatNumber(page.height - y1Top)} m ${formatNumber(x2)} ${formatNumber(page.height - y2Top)} l S\nQ\n`);
+        }
+
+        function textLine(text, x, yTop, options = {}) {
+            const size = options.size || 10;
+            const font = options.font || 'F1';
+            const color = options.color || theme.ink;
+            const align = options.align || 'left';
+            let drawX = x;
+
+            if (align !== 'left') {
+                const textWidth = estimateTextWidth(text, size, font);
+                drawX = align === 'center' ? x - textWidth / 2 : x - textWidth;
+            }
+
+            append(`BT\n/${font} ${formatNumber(size)} Tf\n${pdfColor(color)} rg\n1 0 0 1 ${formatNumber(drawX)} ${formatNumber(page.height - yTop - size * 0.82)} Tm\n${pdfLiteral(text)} Tj\nET\n`);
+        }
+
+        function finish() {
+            if (stream) {
+                pages.push(stream);
+            }
+
+            const total = pages.length;
+            const pagesWithFooters = pages.map((pageStream, index) => {
+                return pageStream + drawPageFooter(index + 1, total, theme, page);
+            });
+
+            return createPdfFileBytes(pagesWithFooters, page);
+        }
+
+        return {
+            page,
+            get y() { return y; },
+            set y(value) { y = value; },
+            get left() { return page.marginLeft; },
+            get right() { return page.width - page.marginRight; },
+            get bottom() { return page.height - page.marginBottom; },
+            get contentWidth() { return page.width - page.marginLeft - page.marginRight; },
+            ensureSpace,
+            addPage,
+            rect,
+            line,
+            textLine,
+            finish
+        };
+    }
+
+    function drawPdfCover(pdf, dieta, theme) {
+        const left = pdf.left;
+        const width = pdf.contentWidth;
+        const titleLines = wrapPdfText(dieta.nombre, width - 28, 24, 'F3');
+        const descriptionLines = wrapPdfText(dieta.descripcion, width - 28, 9.4, 'F1');
+        const flavorSummary = getFlavorSummary(dieta);
+        const flavorsBest = flavorSummary.mejorText;
+        const flavorsAvoid = flavorSummary.evitarText;
+        const tasteWidth = (width - 10) / 2;
+        const tasteBestLines = wrapPdfText(flavorsBest, tasteWidth - 22, 8.2, 'F1');
+        const tasteAvoidLines = wrapPdfText(flavorsAvoid, tasteWidth - 22, 8.2, 'F1');
+        const tasteHeight = Math.max(32, 17 + Math.max(tasteBestLines.length, tasteAvoidLines.length) * 9.2);
+        const coverHeight = 53 + titleLines.length * 27 + descriptionLines.length * 11.5 + tasteHeight;
+        let y = pdf.y;
+
+        pdf.rect(left, y, width, coverHeight, theme.soft, theme.line, 0.75);
+        pdf.rect(left, y, width, 6, theme.primary);
+        y += 17;
+
+        pdf.textLine('VEDAMCI', left + 15, y, { font: 'F2', size: 8.8, color: theme.dark });
+        pdf.textLine('Ayurveda México 2026', left + width - 15, y, { size: 8, color: theme.muted, align: 'right' });
+        y += 23;
+
+        titleLines.forEach(line => {
+            pdf.textLine(line, left + 15, y, { font: 'F3', size: 24, color: theme.dark });
+            y += 27;
+        });
+
+        y += 2;
+        descriptionLines.forEach(line => {
+            pdf.textLine(line, left + 15, y, { size: 9.4, color: theme.muted });
+            y += 11.5;
+        });
+
+        y += 10;
+        drawTasteBox(pdf, left + 15, y, tasteWidth, tasteHeight, 'Mejor', tasteBestLines, theme.green, theme);
+        drawTasteBox(pdf, left + 15 + tasteWidth + 10, y, tasteWidth, tasteHeight, flavorSummary.evitarLabel, tasteAvoidLines, theme.red, theme);
+
+        pdf.y = pdf.y + coverHeight + 17;
+    }
+
+    function drawTasteBox(pdf, x, y, width, height, label, lines, color, theme) {
+        pdf.rect(x, y, width, height, theme.white, theme.line, 0.65);
+        pdf.rect(x, y, 4, height, color);
+        pdf.textLine(label, x + 12, y + 7, { font: 'F2', size: 7.6, color });
+        lines.forEach((line, index) => {
+            pdf.textLine(line, x + 12, y + 18 + index * 9.2, { size: 8.2, color: theme.ink });
+        });
+    }
+
+    function drawPdfCategory(pdf, catName, category, number, theme) {
+        const columns = buildPdfColumns(category, theme);
+        const estimatedHeight = measurePdfCategory(catName, category, columns, pdf.contentWidth);
+
+        pdf.ensureSpace(estimatedHeight);
+
+        let y = pdf.y;
+        const left = pdf.left;
+        const width = pdf.contentWidth;
+        const numberText = String(number).padStart(2, '0');
+
+        pdf.line(left, y, left + width, y, theme.primary, 1.2);
+        pdf.textLine(numberText, left, y + 7, { font: 'F2', size: 8.6, color: theme.primary });
+        pdf.textLine(catName, left + 31, y + 4, { font: 'F3', size: 15.4, color: theme.dark });
+        y += 25;
+
+        if (category.descripcion_general) {
+            const lines = wrapPdfText(category.descripcion_general, width - 18, 8.2, 'F4');
+            const descHeight = 12 + lines.length * 9.4;
+            pdf.rect(left, y, width, descHeight, theme.light);
+            pdf.rect(left, y, 4, descHeight, theme.primary);
+            lines.forEach((line, index) => {
+                pdf.textLine(line, left + 10, y + 7 + index * 9.4, { font: 'F4', size: 8.2, color: theme.muted });
+            });
+            y += descHeight + 11;
+        }
+
+        const gap = 12;
+        const colWidth = (width - gap * 2) / 3;
+        const startY = y;
+        let maxY = startY;
+
+        columns.forEach((column, index) => {
+            const x = left + index * (colWidth + gap);
+            const bottomY = drawPdfColumn(pdf, column, x, startY, colWidth, theme);
+            maxY = Math.max(maxY, bottomY);
+        });
+
+        pdf.y = maxY + 16;
+    }
+
+    function buildPdfColumns(category, theme) {
+        return [
+            { title: 'Mejor / recomendados', items: category.mejor || [], color: theme.green, background: '#edf7ee' },
+            { title: 'Pequeñas cantidades', items: category.moderado || [], color: theme.orange, background: '#fff4e3' },
+            { title: 'Evitar', items: category.evitar || [], color: theme.red, background: '#fdebed' }
+        ];
+    }
+
+    function drawPdfColumn(pdf, column, x, y, width, theme) {
+        pdf.rect(x, y, width, 14, column.background, column.color, 0.55);
+        pdf.textLine(column.title, x + width / 2, y + 4, { font: 'F2', size: 7.2, color: column.color, align: 'center' });
+        y += 18;
+
+        if (!column.items.length) {
+            pdf.textLine('Sin indicaciones', x, y + 2, { font: 'F4', size: 7.4, color: theme.muted });
+            return y + 15;
+        }
+
+        column.items.forEach(item => {
+            const rowHeight = measurePdfFoodRow(item, width);
+            drawPdfFoodRow(pdf, item, x, y, width, rowHeight, theme);
+            y += rowHeight;
+        });
+
+        return y;
+    }
+
+    function drawPdfFoodRow(pdf, item, x, y, width, rowHeight, theme) {
+        const isLocal = esAlimentoMexicano(item.alimento);
+        const nameWidth = width - (isLocal ? 20 : 0);
+        const nameLines = wrapPdfText(item.alimento, nameWidth, 7.8, 'F2');
+        const noteLines = item.nota ? wrapPdfText(item.nota, width, 6.9, 'F1') : [];
+        let lineY = y + 3.2;
+
+        nameLines.forEach(line => {
+            pdf.textLine(line, x, lineY, { font: 'F2', size: 7.8, color: theme.dark });
+            lineY += 9;
+        });
+
+        if (isLocal) {
+            pdf.rect(x + width - 16, y + 2.4, 16, 8.4, theme.white, theme.teal, 0.45);
+            pdf.textLine('MX', x + width - 8, y + 4, { font: 'F2', size: 5.6, color: theme.teal, align: 'center' });
+        }
+
+        noteLines.forEach(line => {
+            pdf.textLine(line, x, lineY, { size: 6.9, color: theme.muted });
+            lineY += 8;
+        });
+
+        pdf.line(x, y + rowHeight - 1.8, x + width, y + rowHeight - 1.8, theme.line, 0.45);
+    }
+
+    function drawPdfClosingNote(pdf, theme) {
+        const height = 38;
+        pdf.ensureSpace(height);
+        const y = pdf.y;
+
+        pdf.line(pdf.left, y, pdf.right, y, theme.primary, 1);
+        pdf.textLine('Estas dietas se basan en los principios de la medicina Ayurvédica tradicional, adaptadas con alimentos locales mexicanos.', pdf.left + pdf.contentWidth / 2, y + 10, { size: 7.8, color: theme.muted, align: 'center' });
+        pdf.textLine('Contacto VEDAMCI · Cel: 3311651870 · vedamci.com.mx', pdf.left + pdf.contentWidth / 2, y + 22, { font: 'F2', size: 8, color: theme.dark, align: 'center' });
+        pdf.y += height;
+    }
+
+    function measurePdfCategory(catName, category, columns, contentWidth) {
+        const gap = 12;
+        const colWidth = (contentWidth - gap * 2) / 3;
+        const titleHeight = Math.max(25, wrapPdfText(catName, contentWidth - 31, 15.4, 'F3').length * 18 + 8);
+        const descriptionHeight = category.descripcion_general
+            ? 23 + wrapPdfText(category.descripcion_general, contentWidth - 18, 8.2, 'F4').length * 9.4
+            : 0;
+        const maxColumnHeight = Math.max(...columns.map(column => {
+            const itemHeight = column.items.length
+                ? column.items.reduce((total, item) => total + measurePdfFoodRow(item, colWidth), 0)
+                : 15;
+            return 18 + itemHeight;
+        }));
+
+        return titleHeight + descriptionHeight + maxColumnHeight + 16;
+    }
+
+    function measurePdfFoodRow(item, width) {
+        const nameWidth = width - (esAlimentoMexicano(item.alimento) ? 20 : 0);
+        const nameLines = wrapPdfText(item.alimento, nameWidth, 7.8, 'F2').length;
+        const noteLines = item.nota ? wrapPdfText(item.nota, width, 6.9, 'F1').length : 0;
+        return Math.max(16, 7 + nameLines * 9 + noteLines * 8);
+    }
+
+    function drawPageFooter(pageNumber, totalPages, theme, page) {
+        const y = page.height - 31;
+        const left = page.marginLeft;
+        const right = page.width - page.marginRight;
+        const line = `q\n${pdfColor(theme.line)} RG\n0.45 w\n${formatNumber(left)} ${formatNumber(page.height - y)} m ${formatNumber(right)} ${formatNumber(page.height - y)} l S\nQ\n`;
+        const brand = pdfTextCommand('VEDAMCI · vedamci.com.mx', left, y + 8, { size: 7, color: theme.muted, font: 'F1' }, page);
+        const pageText = pdfTextCommand(`Página ${pageNumber} / ${totalPages}`, right, y + 8, { size: 7, color: theme.muted, font: 'F1', align: 'right' }, page);
+
+        return line + brand + pageText;
+    }
+
+    function createPdfFileBytes(pageStreams, page) {
+        const chunks = [];
+        const offsets = [0];
+        let offset = 0;
+
+        function addBytes(bytes) {
+            chunks.push(bytes);
+            offset += bytes.length;
+        }
+
+        function addAscii(value) {
+            addBytes(binaryStringToBytes(value));
+        }
+
+        function addObject(id, body) {
+            offsets[id] = offset;
+            addAscii(`${id} 0 obj\n${body}\nendobj\n`);
+        }
+
+        addAscii('%PDF-1.4\n%\xB5\xED\xAE\xFB\n');
+
+        const pageObjects = pageStreams.map((_, index) => 7 + index * 2);
+        const contentObjects = pageStreams.map((_, index) => 8 + index * 2);
+
+        addObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+        addObject(2, `<< /Type /Pages /Kids [${pageObjects.map(id => `${id} 0 R`).join(' ')}] /Count ${pageStreams.length} >>`);
+        addObject(3, '<< /Type /Font /Subtype /Type1 /BaseFont /Times-Roman /Encoding /WinAnsiEncoding >>');
+        addObject(4, '<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold /Encoding /WinAnsiEncoding >>');
+        addObject(5, '<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold /Encoding /WinAnsiEncoding >>');
+        addObject(6, '<< /Type /Font /Subtype /Type1 /BaseFont /Times-Italic /Encoding /WinAnsiEncoding >>');
+
+        pageStreams.forEach((streamContent, index) => {
+            const pageObject = pageObjects[index];
+            const contentObject = contentObjects[index];
+            const streamBytes = binaryStringToBytes(streamContent);
+
+            addObject(pageObject, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${formatNumber(page.width)} ${formatNumber(page.height)}] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents ${contentObject} 0 R >>`);
+
+            offsets[contentObject] = offset;
+            addAscii(`${contentObject} 0 obj\n<< /Length ${streamBytes.length} >>\nstream\n`);
+            addBytes(streamBytes);
+            addAscii('\nendstream\nendobj\n');
+        });
+
+        const xrefOffset = offset;
+        const totalObjects = 6 + pageStreams.length * 2;
+        addAscii(`xref\n0 ${totalObjects + 1}\n`);
+        addAscii('0000000000 65535 f \n');
+        for (let id = 1; id <= totalObjects; id += 1) {
+            addAscii(`${String(offsets[id]).padStart(10, '0')} 00000 n \n`);
+        }
+        addAscii(`trailer\n<< /Size ${totalObjects + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+        return concatByteArrays(chunks);
+    }
+
+    function wrapPdfText(text, maxWidth, fontSize, font = 'F1') {
+        const words = String(text || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+        const lines = [];
+        let current = '';
+
+        words.forEach(word => {
+            const test = current ? `${current} ${word}` : word;
+            if (estimateTextWidth(test, fontSize, font) <= maxWidth) {
+                current = test;
+                return;
+            }
+
+            if (current) {
+                lines.push(current);
+                current = '';
+            }
+
+            if (estimateTextWidth(word, fontSize, font) <= maxWidth) {
+                current = word;
+            } else {
+                splitLongPdfWord(word, maxWidth, fontSize, font).forEach(part => {
+                    if (estimateTextWidth(part, fontSize, font) > maxWidth) {
+                        lines.push(part);
+                    } else if (!current) {
+                        current = part;
+                    } else {
+                        lines.push(current);
+                        current = part;
+                    }
+                });
+            }
+        });
+
+        if (current) lines.push(current);
+        return lines.length ? lines : [''];
+    }
+
+    function splitLongPdfWord(word, maxWidth, fontSize, font) {
+        const parts = [];
+        let current = '';
+        Array.from(word).forEach(char => {
+            const test = `${current}${char}`;
+            if (current && estimateTextWidth(test, fontSize, font) > maxWidth) {
+                parts.push(current);
+                current = char;
+            } else {
+                current = test;
+            }
+        });
+        if (current) parts.push(current);
+        return parts;
+    }
+
+    function estimateTextWidth(text, fontSize, font = 'F1') {
+        const weight = font === 'F2' || font === 'F3' ? 1.05 : 1;
+        return Array.from(String(text || '')).reduce((total, char) => total + estimateCharWidth(char), 0) * fontSize * weight;
+    }
+
+    function estimateCharWidth(char) {
+        if (char === ' ') return 0.28;
+        if ('ilI.,:;!|\'`'.includes(char)) return 0.24;
+        if ('jrtf()[]{}"'.includes(char)) return 0.34;
+        if ('mwMW@%&'.includes(char)) return 0.78;
+        if ('ABCDEFGHKNOPQRSTUVWXYZÁÉÍÓÚÑ'.includes(char)) return 0.62;
+        if ('0123456789'.includes(char)) return 0.52;
+        if ('-/\\'.includes(char)) return 0.34;
+        return 0.49;
+    }
+
+    function pdfTextCommand(text, x, yTop, options, page) {
+        const size = options.size || 10;
+        const font = options.font || 'F1';
+        const color = options.color || '#000000';
+        let drawX = x;
+
+        if (options.align && options.align !== 'left') {
+            const textWidth = estimateTextWidth(text, size, font);
+            drawX = options.align === 'center' ? x - textWidth / 2 : x - textWidth;
+        }
+
+        return `BT\n/${font} ${formatNumber(size)} Tf\n${pdfColor(color)} rg\n1 0 0 1 ${formatNumber(drawX)} ${formatNumber(page.height - yTop - size * 0.82)} Tm\n${pdfLiteral(text)} Tj\nET\n`;
+    }
+
+    function pdfLiteral(value) {
+        let output = '(';
+        Array.from(String(value ?? '')).forEach(char => {
+            const code = winAnsiCode(char);
+            if (code === 40 || code === 41 || code === 92) {
+                output += `\\${String.fromCharCode(code)}`;
+            } else if (code < 32) {
+                output += ' ';
+            } else {
+                output += String.fromCharCode(code);
+            }
+        });
+        return `${output})`;
+    }
+
+    function winAnsiCode(char) {
+        const replacements = {
+            '–': 150,
+            '—': 151,
+            '‘': 145,
+            '’': 146,
+            '“': 147,
+            '”': 148,
+            '…': 133,
+            '•': 149,
+            '™': 153,
+            '€': 128
+        };
+        const code = char.charCodeAt(0);
+
+        if (replacements[char]) return replacements[char];
+        if ((code >= 32 && code <= 126) || (code >= 160 && code <= 255)) return code;
+        return 63;
+    }
+
+    function pdfColor(hex) {
+        const value = hex.replace('#', '');
+        const r = parseInt(value.slice(0, 2), 16) / 255;
+        const g = parseInt(value.slice(2, 4), 16) / 255;
+        const b = parseInt(value.slice(4, 6), 16) / 255;
+        return `${formatNumber(r)} ${formatNumber(g)} ${formatNumber(b)}`;
+    }
+
+    function formatNumber(value) {
+        return Number(value).toFixed(3).replace(/0+$/, '').replace(/\.$/, '');
+    }
+
+    function binaryStringToBytes(value) {
+        const bytes = new Uint8Array(value.length);
+        for (let index = 0; index < value.length; index += 1) {
+            bytes[index] = value.charCodeAt(index) & 0xff;
+        }
+        return bytes;
+    }
+
+    function concatByteArrays(arrays) {
+        const totalLength = arrays.reduce((total, array) => total + array.length, 0);
+        const output = new Uint8Array(totalLength);
+        let offset = 0;
+        arrays.forEach(array => {
+            output.set(array, offset);
+            offset += array.length;
+        });
+        return output;
+    }
+
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        window.__VEDAMCI_PDF_TEST__ = { createDietaPdfBytes };
     }
 
     loadData();
