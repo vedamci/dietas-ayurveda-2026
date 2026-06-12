@@ -575,12 +575,17 @@ body {
    PRINT OPTIMIZATION (@media print)
    ========================================================================== */
 @media print {
-    /* Set page margins */
     @page {
-        margin: 1.2cm 1.5cm;
+        margin: 1.1cm 1.3cm 1.2cm;
     }
-    
-    /* Hide all web interactive elements */
+
+    *,
+    *::before,
+    *::after {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
     .sidebar,
     .controls-header,
     .btn-print,
@@ -588,186 +593,225 @@ body {
     .sidebar-footer {
         display: none !important;
     }
-    
-    /* Layout adjustments for print */
+
     .app-container {
         display: block !important;
+        background: #ffffff !important;
     }
-    
+
     .main-content {
         margin-left: 0 !important;
         padding: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
     }
-    
+
     body {
         background-color: #ffffff !important;
-        color: #000000 !important;
-        font-size: 9.5pt;
+        color: #222222 !important;
+        font-size: 9pt !important;
+        line-height: 1.38 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
-    
-    /* Elegant Print Header */
+
     .diet-header {
-        background: none !important;
-        border: none !important;
-        border-bottom: 3px double var(--color-primary, #000000) !important;
-        padding: 0 0 1.2rem 0 !important;
-        margin-bottom: 1.8rem !important;
-        text-align: center !important;
+        background: #ffffff !important;
+        border: 1px solid #ded6cc !important;
+        border-top: 6px solid var(--color-primary, #000000) !important;
         border-radius: 0 !important;
+        padding: 1rem 1.1rem !important;
+        margin-bottom: 1.2rem !important;
+        text-align: left !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
-    
+
+    .diet-header::before {
+        display: none !important;
+    }
+
     .diet-title {
-        font-size: 22pt !important;
-        color: #000000 !important;
-        margin-bottom: 0.4rem !important;
-        text-align: center !important;
+        font-size: 21pt !important;
+        color: var(--color-primary-dark, #000000) !important;
+        margin-bottom: 0.35rem !important;
+        text-align: left !important;
+        line-height: 1.12 !important;
     }
-    
+
     .diet-description {
-        font-size: 10pt !important;
-        margin: 0 auto 0.8rem auto !important;
-        max-width: 90% !important;
-        text-align: center !important;
-        font-style: italic !important;
+        font-size: 9.3pt !important;
+        margin: 0 0 0.75rem 0 !important;
+        max-width: none !important;
+        text-align: left !important;
+        font-style: normal !important;
+        line-height: 1.45 !important;
+        color: #4f4a45 !important;
     }
-    
+
     .diet-attributes {
-        justify-content: center !important;
-        gap: 1.5rem !important;
-        margin-top: 0.8rem !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.5rem !important;
+        margin-top: 0.7rem !important;
     }
-    
+
     .attribute-tag {
-        border: 1px solid #999999 !important;
+        border: 1px solid #ded6cc !important;
         box-shadow: none !important;
         background-color: #ffffff !important;
-        font-size: 8.5pt !important;
-        padding: 0.2rem 0.8rem !important;
+        font-size: 8.1pt !important;
+        line-height: 1.35 !important;
+        padding: 0.35rem 0.5rem !important;
         border-left: 4px solid var(--color-primary, #000000) !important;
         border-radius: 4px !important;
+        display: block !important;
     }
-    
-    /* Category print styles */
+
+    .categories-container {
+        gap: 0 !important;
+    }
+
     .category-card {
-        page-break-inside: avoid !important; /* Avoid breaking cards mid-page */
+        page-break-inside: auto !important;
+        break-inside: auto !important;
         box-shadow: none !important;
         border: none !important;
-        border-bottom: 1px dashed #cccccc !important;
-        padding: 1.2rem 0 !important;
-        margin-bottom: 0.5rem !important;
+        border-bottom: 1px solid #ded6cc !important;
+        background: transparent !important;
+        padding: 0 0 0.85rem 0 !important;
+        margin-bottom: 1rem !important;
         border-radius: 0 !important;
     }
-    
+
+    .category-card:hover,
+    .food-item:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
     .category-header {
-        border-bottom: 1.5px solid var(--color-primary, #000000) !important;
-        margin-bottom: 0.8rem !important;
-        padding-bottom: 0.2rem !important;
+        border-bottom: 2px solid var(--color-primary, #000000) !important;
+        margin-bottom: 0.55rem !important;
+        padding-bottom: 0.25rem !important;
         page-break-after: avoid !important;
         break-after: avoid !important;
     }
-    
+
     .category-title {
-        font-size: 13pt !important;
-        color: #000000 !important;
+        font-size: 14pt !important;
+        color: var(--color-primary-dark, #000000) !important;
         font-weight: 700 !important;
+        line-height: 1.15 !important;
     }
-    
+
     .category-description {
-        background-color: #f7f7f7 !important;
+        background-color: var(--color-primary-light, #f7f7f7) !important;
         border-left: 3px solid var(--color-primary, #000000) !important;
-        padding: 0.5rem 0.8rem !important;
-        font-size: 8.5pt !important;
-        margin-bottom: 1rem !important;
-        color: #444444 !important;
-    }
-    
-    /* Dynamic Grid Layout in print */
-    .lists-grid {
-        display: grid !important;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
-        gap: 1.2rem !important;
-    }
-    
-    .list-column {
-        gap: 0.6rem !important;
+        padding: 0.42rem 0.6rem !important;
+        font-size: 8pt !important;
+        margin-bottom: 0.65rem !important;
+        color: #4f4a45 !important;
+        line-height: 1.35 !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
     }
-    
+
+    .lists-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 0.75rem !important;
+        align-items: start !important;
+    }
+
+    .list-column {
+        gap: 0.35rem !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+    }
+
     .column-title-badge {
-        background: none !important;
+        background: #ffffff !important;
         border: 1px solid var(--color-primary, #000000) !important;
-        color: #000000 !important;
-        padding: 0.15rem 0.4rem !important;
-        font-size: 7.5pt !important;
+        color: var(--color-primary-dark, #000000) !important;
+        padding: 0.22rem 0.35rem !important;
+        font-size: 6.8pt !important;
+        line-height: 1.15 !important;
         border-radius: 4px !important;
         font-weight: 700 !important;
-        margin-bottom: 0.3rem !important;
+        margin-bottom: 0.15rem !important;
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center !important;
+        letter-spacing: 0 !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
     }
-    
+
     .food-list {
-        gap: 0.4rem !important;
+        display: block !important;
+        gap: 0 !important;
     }
-    
-    /* Clean list format with bullets */
+
     .food-item {
         background-color: transparent !important;
         border: none !important;
-        padding: 0.1rem 0 !important;
-        margin-bottom: 0.15rem !important;
+        border-bottom: 1px solid #e8e3dd !important;
+        border-radius: 0 !important;
+        padding: 0.16rem 0 0.22rem 0 !important;
+        margin: 0 !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        display: list-item !important;
-        list-style-type: square !important;
-        margin-left: 1.1rem !important;
+        display: block !important;
     }
-    
-    /* Flow name and notes inline */
+
     .food-name {
-        font-size: 9pt !important;
-        color: #000000 !important;
+        font-size: 8.3pt !important;
+        color: var(--color-primary-dark, #000000) !important;
         font-weight: 600 !important;
         display: inline !important;
+        line-height: 1.25 !important;
     }
-    
+
     .food-note {
-        font-size: 8pt !important;
-        color: #444444 !important;
-        display: inline !important;
+        font-size: 7.3pt !important;
+        color: #55504b !important;
+        display: block !important;
+        line-height: 1.25 !important;
+        margin-top: 0.02rem !important;
     }
-    
+
     .food-note::before {
-        content: " — " !important;
-        font-weight: normal !important;
+        content: "" !important;
     }
-    
+
     .mexico-tag {
         border: 1px solid #00796b !important;
         background-color: #ffffff !important;
         color: #00796b !important;
-        font-size: 5.5pt !important;
-        padding: 0 0.2rem !important;
+        font-size: 5.3pt !important;
+        line-height: 1 !important;
+        padding: 0.05rem 0.2rem !important;
         display: inline-block !important;
         margin-left: 0.3rem !important;
         margin-top: 0 !important;
         vertical-align: middle !important;
     }
-    
+
     .diet-footer-info {
         border: none !important;
-        border-top: 1.5px solid var(--color-primary, #000000) !important;
+        border-top: 2px solid var(--color-primary, #000000) !important;
         box-shadow: none !important;
-        padding: 1rem 0 0 0 !important;
-        margin-top: 2rem !important;
-        font-size: 8pt !important;
-        color: #444444 !important;
+        padding: 0.75rem 0 0 0 !important;
+        margin-top: 1.2rem !important;
+        font-size: 7.8pt !important;
+        color: #4f4a45 !important;
+        background: transparent !important;
+        border-radius: 0 !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
     }
-    
-    /* Strict rules to prevent page break issues */
+
     h2, h3, .category-header, .column-title-badge {
         page-break-after: avoid !important;
         break-after: avoid !important;

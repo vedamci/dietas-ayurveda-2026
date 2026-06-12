@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarMenu = document.getElementById('sidebar-menu');
     const dietContent = document.getElementById('diet-content');
     const printBtn = document.getElementById('print-btn');
+    const PDF_RENDER_WIDTH = 760;
 
     // Nombres de alimentos mexicanos para identificar y ponerles la etiqueta "México"
     const listaAlimentosMexicanos = [
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.head.appendChild(style);
             }
 
-            // Construir HTML dedicado para PDF con estilos inline
+            // Construir una plantilla dedicada para PDF
             const pdfContainer = buildPdfHtml(dieta, currentDietKey);
 
             // Creamos un contenedor wrapper posicionado fuera de la pantalla
@@ -66,26 +67,30 @@ document.addEventListener('DOMContentLoaded', () => {
             wrapper.style.position = 'absolute';
             wrapper.style.left = '-9999px';
             wrapper.style.top = '0';
-            wrapper.style.width = '830px';
+            wrapper.style.width = `${PDF_RENDER_WIDTH}px`;
             wrapper.style.overflow = 'hidden';
             
             wrapper.appendChild(pdfContainer);
             document.body.appendChild(wrapper);
 
             const opt = {
-                margin:       [8, 8, 8, 8],
+                margin:       [10, 11, 12, 11],
                 filename:     `Dieta_${currentDietKey}_VEDAMCI_2026.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2,
                     useCORS: true, 
+                    backgroundColor: '#ffffff',
                     logging: false,
                     letterRendering: true,
-                    windowWidth: 830,
-                    width: 830
+                    windowWidth: PDF_RENDER_WIDTH,
+                    width: PDF_RENDER_WIDTH
                 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css'], avoid: '.pdf-category-card' }
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+                pagebreak:    {
+                    mode: ['css', 'legacy'],
+                    avoid: ['.pdf-keep-together', '.pdf-food-row', '.pdf-column-heading']
+                }
             };
 
             // Damos un pequeño delay (150ms) para asegurarnos de que el navegador calcule el layout antes de capturar
@@ -266,131 +271,190 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    function escapeHtml(value) {
+        const escapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+
+        return String(value ?? '').replace(/[&<>"']/g, char => escapeMap[char]);
+    }
+
     // ============================================================
     // Construir HTML dedicado para exportar a PDF
-    // Usa estilos inline simples que html2canvas renderiza bien
+    // Estructura estable para A4, márgenes consistentes y cortes limpios
     // ============================================================
     function buildPdfHtml(dieta, key) {
         // Colores por dosha (sólidos, sin rgba ni gradientes)
         const doshaColors = {
-            'Vata':        { primary: '#3d6a45', light: '#e8f0ea', dark: '#27492d', accent: '#a3b899' },
-            'Pitta':       { primary: '#b33927', light: '#fde8e5', dark: '#822214', accent: '#e5a93b' },
-            'Kapha':       { primary: '#2b5c74', light: '#e3eff5', dark: '#1b3d4f', accent: '#78a1bb' },
-            'Vata-Pitta':  { primary: '#7d5738', light: '#f5ede4', dark: '#523720', accent: '#d2a454' },
-            'Vata-Kapha':  { primary: '#3c5266', light: '#e8edf1', dark: '#243545', accent: '#7ca5b8' },
-            'Pitta-Kapha': { primary: '#2b6b55', light: '#e3f2ec', dark: '#194535', accent: '#d1b46a' },
-            'Tridoshica':  { primary: '#6c4e85', light: '#ede6f3', dark: '#4b3260', accent: '#e5b33b' }
+            'Vata':        { primary: '#3d6a45', light: '#eef5ef', dark: '#27492d', accent: '#a3b899' },
+            'Pitta':       { primary: '#b33927', light: '#fbebe8', dark: '#822214', accent: '#d69b35' },
+            'Kapha':       { primary: '#2b5c74', light: '#e9f2f6', dark: '#1b3d4f', accent: '#78a1bb' },
+            'Vata-Pitta':  { primary: '#7d5738', light: '#f5eee6', dark: '#523720', accent: '#c99745' },
+            'Vata-Kapha':  { primary: '#3c5266', light: '#edf2f5', dark: '#243545', accent: '#7ca5b8' },
+            'Pitta-Kapha': { primary: '#2b6b55', light: '#e9f4ef', dark: '#194535', accent: '#c4a75c' },
+            'Tridoshica':  { primary: '#6c4e85', light: '#f0eaf5', dark: '#4b3260', accent: '#d2a431' }
         };
         const c = doshaColors[key] || doshaColors['Tridoshica'];
+        const neutral = {
+            ink: '#2b2622',
+            muted: '#625b54',
+            soft: '#f8f5f1',
+            line: '#e6ddd3'
+        };
 
         const container = document.createElement('div');
         container.id = 'pdf-render-container';
         container.style.cssText = `
-            width: 830px; 
+            width: ${PDF_RENDER_WIDTH}px;
             background: #ffffff;
-            font-family: 'Outfit', Arial, Helvetica, sans-serif;
-            color: #222222;
-            line-height: 1.5;
-            font-size: 13px;
-            padding: 20px 25px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: ${neutral.ink};
+            line-height: 1.42;
+            font-size: 12px;
+            padding: 0;
             box-sizing: border-box;
         `;
 
-        // --- HEADER ---
-        let saboresMejor = dieta.sabores.mejor.join(', ');
-        let saboresEvitar = dieta.sabores.evitar.join(', ');
+        const styles = `
+            <style>
+                #pdf-render-container * {
+                    box-sizing: border-box;
+                }
 
-        let html = `
-            <div style="text-align:center; padding-bottom:20px; margin-bottom:25px; border-bottom:3px solid ${c.primary};">
-                <div style="font-size:12px; text-transform:uppercase; letter-spacing:3px; color:${c.primary}; margin-bottom:8px; font-weight:600;">VEDAMCI · Ayurveda México 2026</div>
-                <div style="font-family:'Playfair Display',Georgia,serif; font-size:32px; font-weight:700; color:${c.dark}; margin-bottom:10px;">${dieta.nombre}</div>
-                <div style="font-size:13px; color:#555555; max-width:700px; margin:0 auto 18px; font-style:italic;">${dieta.descripcion}</div>
-                <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
-                    <div style="display:inline-block; padding:6px 18px; border:1px solid #2e7d32; border-left:4px solid #2e7d32; font-size:12px;">
-                        <strong style="color:#2e7d32;">Mejor:</strong> <span>${saboresMejor}</span>
-                    </div>
-                    <div style="display:inline-block; padding:6px 18px; border:1px solid #c62828; border-left:4px solid #c62828; font-size:12px;">
-                        <strong style="color:#c62828;">Evitar:</strong> <span>${saboresEvitar}</span>
-                    </div>
-                </div>
-            </div>
+                #pdf-render-container .pdf-keep-together,
+                #pdf-render-container .pdf-food-row,
+                #pdf-render-container .pdf-column-heading {
+                    page-break-inside: avoid;
+                    break-inside: avoid;
+                }
+
+                #pdf-render-container .pdf-section-heading,
+                #pdf-render-container .pdf-column-heading {
+                    page-break-after: avoid;
+                    break-after: avoid;
+                }
+
+                #pdf-render-container .pdf-category {
+                    page-break-inside: auto;
+                    break-inside: auto;
+                }
+            </style>
         `;
 
-        // --- CATEGORÍAS ---
-        Object.keys(dieta.categorias).forEach(catName => {
-            const cat = dieta.categorias[catName];
+        const saboresMejor = escapeHtml(dieta.sabores.mejor.join(', '));
+        const saboresEvitar = escapeHtml(dieta.sabores.evitar.join(', '));
 
-            html += `<div class="pdf-category-card" style="margin-bottom:22px; page-break-inside:avoid; break-inside:avoid;">`;
-
-            // Título de categoría
-            html += `
-                <div style="border-bottom:2px solid ${c.primary}; padding-bottom:6px; margin-bottom:12px;">
-                    <div style="font-family:'Playfair Display',Georgia,serif; font-size:20px; font-weight:700; color:${c.dark};">${catName}</div>
+        let html = styles + `
+            <section class="pdf-cover pdf-keep-together" style="border:1px solid ${neutral.line}; border-top:7px solid ${c.primary}; margin-bottom:18px; background:${neutral.soft};">
+                <div style="padding:20px 24px 18px 24px;">
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:14px;">
+                        <tr>
+                            <td style="width:50%; vertical-align:middle; color:${c.dark}; font-size:11px; font-weight:700;">VEDAMCI</td>
+                            <td style="width:50%; vertical-align:middle; text-align:right; color:${neutral.muted}; font-size:10px;">Ayurveda México 2026</td>
+                        </tr>
+                    </table>
+                    <h1 style="font-family:Georgia,'Times New Roman',serif; font-size:31px; line-height:1.08; color:${c.dark}; margin:0 0 10px 0; font-weight:700;">${escapeHtml(dieta.nombre)}</h1>
+                    <p style="font-size:12.3px; line-height:1.55; color:${neutral.muted}; margin:0 0 16px 0; max-width:690px;">${escapeHtml(dieta.descripcion)}</p>
+                    <table style="width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed;">
+                        <tr>
+                            <td style="width:50%; vertical-align:top; padding:10px 12px; background:#ffffff; border-left:4px solid #2e7d32; border-top:1px solid ${neutral.line}; border-bottom:1px solid ${neutral.line}; border-right:6px solid ${neutral.soft};">
+                                <div style="font-size:9px; font-weight:700; color:#2e7d32; margin-bottom:4px;">Mejor</div>
+                                <div style="font-size:11px; color:${neutral.ink}; line-height:1.42;">${saboresMejor}</div>
+                            </td>
+                            <td style="width:50%; vertical-align:top; padding:10px 12px; background:#ffffff; border-left:4px solid #c62828; border-top:1px solid ${neutral.line}; border-bottom:1px solid ${neutral.line};">
+                                <div style="font-size:9px; font-weight:700; color:#c62828; margin-bottom:4px;">Evitar</div>
+                                <div style="font-size:11px; color:${neutral.ink}; line-height:1.42;">${saboresEvitar}</div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
+            </section>
+        `;
+
+        function renderPdfFoodRows(items) {
+            return items.map(item => {
+                const esMex = esAlimentoMexicano(item.alimento);
+                const noteHtml = item.nota
+                    ? `<div style="font-size:10.3px; color:${neutral.muted}; line-height:1.34; margin-top:1px;">${escapeHtml(item.nota)}</div>`
+                    : '';
+                const mexTag = esMex
+                    ? `<span style="display:inline-block; font-size:8px; line-height:1; font-weight:700; color:#00796b; border:1px solid #80b8ad; padding:2px 4px; margin-left:5px; vertical-align:1px;">MX</span>`
+                    : '';
+
+                return `
+                    <div class="pdf-food-row" style="padding:5px 0 6px 0; border-bottom:1px solid ${neutral.line};">
+                        <div style="font-size:11.3px; line-height:1.28; font-weight:700; color:${c.dark};">${escapeHtml(item.alimento)}${mexTag}</div>
+                        ${noteHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        Object.keys(dieta.categorias).forEach((catName, index) => {
+            const cat = dieta.categorias[catName];
+            const sectionNumber = String(index + 1).padStart(2, '0');
+
+            html += `
+                <section class="pdf-category" style="margin:0 0 17px 0; padding:0 0 14px 0; border-bottom:1px solid ${neutral.line};">
+                    <div class="pdf-section-heading pdf-keep-together" style="display:table; width:100%; border-collapse:collapse; margin-bottom:9px;">
+                        <div style="display:table-cell; width:38px; vertical-align:middle; color:${c.primary}; font-size:10px; font-weight:700; border-top:2px solid ${c.primary}; padding-top:6px;">${sectionNumber}</div>
+                        <div style="display:table-cell; vertical-align:middle; border-top:2px solid ${c.primary}; padding-top:4px;">
+                            <h2 style="font-family:Georgia,'Times New Roman',serif; font-size:19px; line-height:1.16; color:${c.dark}; margin:0; font-weight:700;">${escapeHtml(catName)}</h2>
+                        </div>
+                    </div>
             `;
 
-            // Descripción general
             if (cat.descripcion_general) {
                 html += `
-                    <div style="background:${c.light}; border-left:4px solid ${c.primary}; padding:8px 14px; margin-bottom:14px; font-size:12px; color:#444444; font-style:italic;">
-                        ${cat.descripcion_general}
+                    <div class="pdf-keep-together" style="background:${c.light}; border-left:4px solid ${c.primary}; padding:8px 11px; margin-bottom:11px; font-size:11px; color:${neutral.muted}; line-height:1.42;">
+                        ${escapeHtml(cat.descripcion_general)}
                     </div>
                 `;
             }
 
-            // Determinar columnas
             const columns = [];
             if (cat.mejor && cat.mejor.length > 0) {
-                columns.push({ title: 'Mejor / Recomendados', items: cat.mejor, color: '#2e7d32', bgColor: '#e8f5e9' });
+                columns.push({ title: 'Mejor / recomendados', items: cat.mejor, color: '#2e7d32', bgColor: '#edf7ee' });
             }
             if (cat.moderado && cat.moderado.length > 0) {
-                columns.push({ title: 'Pequeñas cantidades', items: cat.moderado, color: '#ef6c00', bgColor: '#fff3e0' });
+                columns.push({ title: 'Pequeñas cantidades', items: cat.moderado, color: '#b86200', bgColor: '#fff4e3' });
             }
             if (cat.evitar && cat.evitar.length > 0) {
-                columns.push({ title: 'Evitar', items: cat.evitar, color: '#c62828', bgColor: '#ffebee' });
+                columns.push({ title: 'Evitar', items: cat.evitar, color: '#c62828', bgColor: '#fdebed' });
             }
 
             if (columns.length > 0) {
-                const colWidth = Math.floor(100 / columns.length);
+                const colWidth = 100 / columns.length;
                 html += `<table style="width:100%; border-collapse:collapse; table-layout:fixed;"><tr>`;
-                
-                columns.forEach((col, idx) => {
-                    html += `<td style="width:${colWidth}%; vertical-align:top; padding:0 ${idx < columns.length - 1 ? '10' : '0'}px 0 ${idx > 0 ? '10' : '0'}px;">`;
-                    
-                    // Badge del título
-                    html += `
-                        <div style="display:inline-block; padding:3px 10px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:${col.color}; background:${col.bgColor}; border:1px solid ${col.color}; margin-bottom:8px;">
-                            ${col.title}
-                        </div>
-                    `;
-                    
-                    // Lista de alimentos
-                    col.items.forEach(item => {
-                        const esMex = esAlimentoMexicano(item.alimento);
-                        html += `
-                            <div style="padding:5px 8px; margin-bottom:4px; background:${c.light}; border:1px solid #e0e0e0; font-size:12px;">
-                                <span style="font-weight:600; color:${c.dark};">${item.alimento}</span>
-                                ${item.nota ? `<span style="color:#666666; font-size:11px;"> — ${item.nota}</span>` : ''}
-                                ${esMex ? `<span style="display:inline-block; font-size:9px; font-weight:700; color:#00796b; border:1px solid #00796b; padding:0 4px; margin-left:4px; vertical-align:middle;">🇲🇽 MX</span>` : ''}
-                            </div>
-                        `;
-                    });
 
-                    html += `</td>`;
+                columns.forEach((col, idx) => {
+                    html += `
+                        <td style="width:${colWidth}%; vertical-align:top; padding:0 ${idx < columns.length - 1 ? '8px' : '0'} 0 ${idx > 0 ? '8px' : '0'};">
+                            <div class="pdf-column-heading" style="font-size:9px; line-height:1.1; font-weight:700; color:${col.color}; background:${col.bgColor}; border:1px solid ${col.color}; border-radius:4px; padding:5px 7px; margin-bottom:5px;">
+                                ${escapeHtml(col.title)}
+                            </div>
+                            ${renderPdfFoodRows(col.items)}
+                        </td>
+                    `;
                 });
 
                 html += `</tr></table>`;
             }
 
-            html += `</div>`; // fin pdf-category-card
+            html += `
+                </section>
+            `;
         });
 
-        // --- FOOTER ---
         html += `
-            <div style="margin-top:25px; padding-top:15px; border-top:2px solid ${c.primary}; text-align:center; font-size:11px; color:#777777;">
+            <footer class="pdf-keep-together" style="margin-top:18px; padding:12px 0 0 0; border-top:2px solid ${c.primary}; text-align:center; color:${neutral.muted}; font-size:10.5px; line-height:1.45;">
                 <div>Estas dietas se basan en los principios de la medicina Ayurvédica tradicional, adaptadas con alimentos locales mexicanos.</div>
-                <div style="margin-top:5px;">Contacto VEDAMCI · Cel: 3311651870 · vedamci.com.mx</div>
-            </div>
+                <div style="margin-top:4px; color:${c.dark}; font-weight:700;">Contacto VEDAMCI · Cel: 3311651870 · vedamci.com.mx</div>
+            </footer>
         `;
 
         container.innerHTML = html;
