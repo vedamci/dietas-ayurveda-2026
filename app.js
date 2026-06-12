@@ -59,16 +59,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Construir HTML dedicado para PDF con estilos inline
             const pdfContainer = buildPdfHtml(dieta, currentDietKey);
+
+            // Creamos un contenedor wrapper posicionado fuera de la pantalla
+            // para que el navegador calcule el layout sin que el usuario lo vea.
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = '-9999px';
+            wrapper.style.top = '0';
+            wrapper.style.width = '830px';
+            wrapper.style.overflow = 'hidden';
             
-            // Posicionamos el contenedor directamente en left: 0, top: 0 pero detrás de todo con z-index: -100.
-            // Esto asegura coordenadas (0,0) perfectas para la bounding box de html2canvas,
-            // mientras se mantiene oculto debajo de la persiana opaca del contenedor principal.
-            pdfContainer.style.position = 'absolute';
-            pdfContainer.style.left = '0';
-            pdfContainer.style.top = '0';
-            pdfContainer.style.zIndex = '-100';
-            pdfContainer.style.margin = '0';
-            document.body.appendChild(pdfContainer);
+            wrapper.appendChild(pdfContainer);
+            document.body.appendChild(wrapper);
 
             const opt = {
                 margin:       [8, 8, 8, 8],
@@ -79,11 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     useCORS: true, 
                     logging: false,
                     letterRendering: true,
-                    windowWidth: 900,
-                    scrollX: 0,
-                    scrollY: 0,
-                    x: 0,
-                    y: 0
+                    windowWidth: 830,
+                    width: 830
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: ['avoid-all', 'css'], avoid: '.pdf-category-card' }
@@ -92,12 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Damos un pequeño delay (150ms) para asegurarnos de que el navegador calcule el layout antes de capturar
             setTimeout(() => {
                 html2pdf().set(opt).from(pdfContainer).save().then(() => {
-                    document.body.removeChild(pdfContainer);
+                    document.body.removeChild(wrapper);
                     printBtn.disabled = false;
                     printBtn.innerHTML = originalText;
                 }).catch(err => {
                     console.error('Error al generar PDF:', err);
-                    if (pdfContainer.parentNode) document.body.removeChild(pdfContainer);
+                    if (wrapper.parentNode) document.body.removeChild(wrapper);
                     printBtn.disabled = false;
                     printBtn.innerHTML = originalText;
                     alert('Ocurrió un error al generar el PDF.');
