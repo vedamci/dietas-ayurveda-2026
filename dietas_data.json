@@ -1110,6 +1110,31 @@
             "nota": "Ácidos y desequilibrantes"
           }
         ]
+      },
+      "Faltantes 2026": {
+        "descripcion_general": "Alimentos añadidos a la lista Pitta 2026. Espinacas y camarón de agua dulce quedan en pequeñas cantidades.",
+        "mejor": [
+          { "alimento": "Centeno y farro", "nota": "Preferentemente cocidos" },
+          { "alimento": "Melón, sandía, durazno, fresas, zarzamoras, frambuesas, arándanos, ciruela, papaya, higo y coco", "nota": "Maduros, dulces y refrescantes" },
+          { "alimento": "Acelgas, kale, alfalfa, apio y espárragos", "nota": "Frescos o cocidos suavemente" },
+          { "alimento": "Semillas de cilantro y vainilla", "nota": "Especias suaves" },
+          { "alimento": "Chícharos y soya", "nota": "Adecuados en porciones moderadas" }
+        ],
+        "moderado": [
+          { "alimento": "Queso fresco y panela, kefir, nata y leche evaporada o condensada", "nota": "Preferir versiones frescas y sin azúcar" },
+          { "alimento": "Aceitunas, tamarindo y frutos secos", "nota": "Pequeñas cantidades por su sal, acidez o concentración" },
+          { "alimento": "Espinacas, arúgula, rábano, betabel, yuca, ajo puerro, morrones y berenjena", "nota": "Preferir cocidos y no picantes" },
+          { "alimento": "Aceite de maíz y canola", "nota": "Usar con moderación" },
+          { "alimento": "Chivo o cabra, codorniz y camarón de agua dulce", "nota": "Pequeñas cantidades y preparaciones ligeras" },
+          { "alimento": "Piñones, paprika dulce y anís estrella", "nota": "En cantidades pequeñas" },
+          { "alimento": "Frijol rojo y habas", "nota": "Bien cocidos" }
+        ],
+        "evitar": [
+          { "alimento": "Aceite de almendra y manteca de cerdo", "nota": "Pesados o calentadores" },
+          { "alimento": "Avellana, castaña, bellota, nuez pecana, macadamia y anacardo (nuez de la India)", "nota": "Densas y calentadoras" },
+          { "alimento": "Clavo, nuez moscada, fenogreco y jengibre en polvo", "nota": "Calentadores durante exceso de Pitta" },
+          { "alimento": "Salsa de soya", "nota": "Muy salada; evitar o usar excepcionalmente" }
+        ]
       }
     }
   },
